@@ -1,0 +1,67 @@
+# ============================================================
+# amcl_params.yaml — AMCL 自适应蒙特卡洛定位参数
+# ============================================================
+# 核心作用: 用激光雷达数据匹配地图特征, 动态发布 map→odom TF
+#           持续修正 odom 漂移, 不需要手写静态 TF
+#
+# 硬件: VP100L 单线激光雷达 + 50m×25m 白色围挡 (高25cm)
+# ============================================================
+
+amcl:
+  ros__parameters:
+
+    # ------ 坐标系 (关键: 让 AMCL 发布 map→odom TF) ------
+    base_frame_id: "base_footprint"     # 车体底盘坐标系
+    odom_frame_id: "odom"               # 里程计坐标系
+    global_frame_id: "map"              # 全局地图坐标系
+
+    # ------ 机器人模型 ------
+    robot_model_type: "differential"    # 差速底盘 (你的小车)
+
+    # ------ 初始位姿 (比赛时可以调) ------
+    # 设小车初始在 map 坐标系原点附近, 协方差设大 → 粒子散开, 设小 → 粒子集中
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+    initial_cov_xx: 0.25     # x 方向不确定性 (m²) — 有围挡可设小
+    initial_cov_yy: 0.25     # y 方向不确定性 (m²)
+    initial_cov_aa: 0.0685   # yaw 方向不确定性 (rad²) — 0.0685 ≈ 15° 的方差
+
+    # ------ 粒子滤波器参数 ------
+    min_particles: 500        # 最少粒子数
+    max_particles: 2000       # 最多粒子数
+    pf_err: 0.01              # 粒子滤波误差
+    pf_z: 0.99                # 粒子滤波权重指数衰减
+    recovery_alpha_slow: 0.001
+    recovery_alpha_fast: 0.1
+
+    # ------ 更新参数 ------
+    update_min_d: 0.25        # 平移超过 0.25m 才更新 (调小 → 更新频繁)
+    update_min_a: 0.2         # 旋转超过 0.2rad 才更新
+    resample_interval: 1      # 每 1 次更新重采样一次
+
+    # ------ 激光雷达模型 ------
+    laser_model_type: "likelihood_field"   # 似然场模型 (计算快, 适合单线雷达)
+    laser_max_range: 15.0                  # VP100L 最大量程
+    laser_min_range: 0.15                  # VP100L 最小量程
+    laser_max_beams: 60                    # 每次更新使用的雷达射线数 (VP100L 单线取60)
+    laser_likelihood_max_dist: 2.0         # 似然场最大匹配距离 (m)
+    laser_z_hit: 0.95                      # 命中概率权重
+    laser_z_max: 0.05                      # 最大距离概率权重
+    laser_z_rand: 0.05                     # 随机噪声权重
+    laser_sigma_hit: 0.2                   # 命中高斯标准差
+
+    # ------ 里程计模型 ------
+    odom_model_type: "diff"                # 差速里程计模型
+    odom_alpha1: 0.2                       # 旋转噪声 (来自旋转)
+    odom_alpha2: 0.2                       # 旋转噪声 (来自平移)
+    odom_alpha3: 0.2                       # 平移噪声 (来自平移)
+    odom_alpha4: 0.2                       # 平移噪声 (来自旋转)
+
+    # ------ 发布 TF ------
+    # critical: 必须为 true, AMCL 才会发布 map→odom 的动态 TF
+    tf_broadcast: true
+    transform_tolerance: 0.5               # TF 变换容差 (s)

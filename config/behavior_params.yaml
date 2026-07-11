@@ -1,0 +1,37 @@
+# ============================================================
+# behavior_params.yaml — Nav2 Behavior Server 参数
+# ============================================================
+# Behavior Server 负责执行 BT 中行为节点的具体动作:
+#   Spin, Wait, BackUp, ClearEntireCostmap 等
+# 注意: 我们在 BT 里不用 BackUp, 这里可以不配 BackUp 参数
+# ============================================================
+
+behavior_server:
+  ros__parameters:
+
+    # ------ 全局配置 ------
+    local_costmap_topic: "local_costmap/costmap_raw"
+    global_costmap_topic: "global_costmap/costmap_raw"
+    local_footprint_topic: "local_costmap/published_footprint"
+    global_footprint_topic: "global_costmap/published_footprint"
+
+    # 机器人足迹 (多边形顶点, 相对于 base_link)
+    # 按你的车尺寸改 — 格式: [[x1,y1], [x2,y2], ...]
+    robot_footprint: "[[0.25, 0.20], [0.25, -0.20], [-0.25, -0.20], [-0.25, 0.20]]"
+    # 如果你的车是圆的, 用 robot_radius: 0.25 代替 robot_footprint
+
+    # ------ 各项行为的参数 ------
+
+    # Spin (原地旋转)
+    # 被调用一次最多转多少弧度 (我们在 BT 里设了 spin_dist=1.57 ≈ 90°)
+    simulate_ahead_time: 1.5
+    max_rotational_vel: 1.0
+    min_rotational_vel: 0.4
+    rotational_acc_lim: 3.2
+
+    # Wait (等待)
+    # wait_duration 在 BT XML 里指定
+
+    # BackUp (倒车 — 虽然 BT 里删了, 但参数留着没关系)
+    backup:
+      plugin: "nav2_back_up_action::BackUp"

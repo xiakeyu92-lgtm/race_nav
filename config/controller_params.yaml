@@ -1,0 +1,61 @@
+# ============================================================
+# controller_params.yaml — DWB 局部规划器参数
+# ============================================================
+# DWB (Dynamic Window with Better scoring) = DWA 的增强版
+# 关键: min_vel_x >= 0 → 禁止倒车 (环形赛道倒车会死)
+# ============================================================
+
+controller_server:
+  ros__parameters:
+
+    # ------ 控制器插件 ------
+    controller_plugins: ["FollowPath"]
+    FollowPath:
+      plugin: "dwb_core::DWBLocalPlanner"
+
+    # ------ DWB 核心参数 ------
+
+    # --- 速度约束 (关键!) ---
+    # min_vel_x >= 0 → 绝对不能有负速度 → 不倒车
+    min_vel_x: 0.0              # ★ 最小前进速度 0 (不倒车的最低要求)
+    max_vel_x: 0.5              # 最大前进速度 (m/s) — 比赛保守一点
+    min_vel_theta: -1.0         # 最小角速度 (rad/s) — 能原地转
+    max_vel_theta: 1.0          # 最大角速度 (rad/s)
+    min_speed_xy: 0.0           # 允许速度为 0 (可以原地转)
+
+    # --- 加速度 ---
+    acc_lim_x: 0.5              # 线加速度 (m/s²)
+    acc_lim_theta: 1.5          # 角加速度 (rad/s²)
+    dec_lim_x: -1.0             # 线减速度 (m/s²)
+
+    # --- 目标容忍度 ---
+    xy_goal_tolerance: 0.15     # 到达目标精度 (m) — 椭圆 waypoint 可以宽一点
+    yaw_goal_tolerance: 0.3     # 朝向精度 (rad) — 约 17°
+    latch_xy_goal_tolerance: false  # true → 一旦到过就认为到了 (防止来回调)
+
+    # --- 轨迹模拟 ---
+    simulate_ahead_time: 1.5    # 向前模拟时间 (s)
+    vx_samples: 20              # 线速度采样数
+    vy_samples: 0               # 横移采样数 = 0 (差速底盘)
+    vth_samples: 40             # 角速度采样数 → 采样越密轨迹越平滑
+
+    # --- 代价权重 ---
+    PathAlign:
+      scale: 32.0               # 对齐全局路径的权重
+    GoalAlign:
+      scale: 24.0               # 朝向目标的权重
+    GoalDist:
+      scale: 24.0               # 接近目标的权重
+    ObstacleScale:
+      scale: 1.0                # 避障权重 (Gen3 调大)
+
+    # --- 逆运动学 ---
+    use_dwa: false              # false → 使用完整轨迹评分
+    prune_plan: true            # 截断远的全局路径 (性能优化)
+
+    # --- 旋转到位 ---
+    max_vel_theta_when_stopped: 0.5   # 到达后旋转到目标朝向的速度
+
+    # --- 倒车检测 (额外安全) ---
+    # 如果你的底盘控制器不支持负速度指令,
+    # 这里设 min_vel_x=0 应该就够了

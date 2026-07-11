@@ -1,0 +1,82 @@
+<!--
+  navigate_recovery_no_backup.xml
+  基于赛方 bad_bt_backup.xml，删除 BackUp 节点 —— 环形赛道不能倒车。
+
+  恢复行为 (按顺序循环尝试):
+    1. 清除 local + global costmap
+    2. 原地旋转 1.57 rad (~90°)
+    3. 等待 5 秒
+    (BackUp 已删除)
+
+  外层的 RecoveryNode 最多重试 6 次。
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+
+    <!--
+      NavigateRecovery: 外层的恢复节点
+      number_of_retries=6 → 主逻辑失败后最多尝试 6 次恢复
+    -->
+    <RecoveryNode number_of_retries="6" name="NavigateRecovery">
+
+      <!-- ======== 正常导航序列 ======== -->
+      <Sequence name="NavigateWithReplanning">
+
+        <!--
+          RateController hz=1.0 → 每秒检查一次路径是否需要重规划
+          Internal RecoveryNode → 规划失败时清 global costmap 重试一次
+        -->
+        <RateController hz="1.0">
+          <RecoveryNode number_of_retries="1" name="ComputePathToPose">
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context"
+                                service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+
+        <!--
+          FollowPath: 路径跟踪
+          失败后 → 清 local costmap 重试一次
+        -->
+        <RecoveryNode number_of_retries="1" name="FollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <ClearEntireCostmap name="ClearLocalCostmap-Context"
+                              service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+
+      </Sequence>
+
+      <!-- ======== 恢复行为序列 (Fallback) ======== -->
+      <ReactiveFallback name="RecoveryFallback">
+
+        <!-- GoalUpdated: 如果来了新 goal，跳出恢复直接导航 -->
+        <GoalUpdated/>
+
+        <!--
+          RoundRobin: 每次恢复调用其中一个动作，轮换执行
+          1. 清 costmap（local + global）
+          2. 原地旋转 90°
+          3. 等待 5 秒
+          注意: 没有 BackUp —— 不倒车
+        -->
+        <RoundRobin name="RecoveryActions">
+
+          <Sequence name="ClearingActions">
+            <ClearEntireCostmap name="ClearLocalCostmap-Subtree"
+                                service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Subtree"
+                                service_name="global_costmap/clear_entirely_global_costmap"/>
+          </Sequence>
+
+          <Spin spin_dist="1.57"/>
+
+          <Wait wait_duration="5"/>
+
+        </RoundRobin>
+
+      </ReactiveFallback>
+
+    </RecoveryNode>
+
+  </BehaviorTree>
+</root>

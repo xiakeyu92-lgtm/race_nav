@@ -1,0 +1,52 @@
+# ============================================================
+# local_costmap.yaml — 局部代价地图参数
+# ============================================================
+# 局部代价地图: DWB 直接用这个做避障和轨迹评分
+# 特点: 小范围、高更新频率、以车为中心滚动
+# ============================================================
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+
+      # 更新频率
+      update_frequency: 10.0        # Hz
+      publish_frequency: 5.0        # Hz
+
+      # 坐标系
+      global_frame: "odom"          # ★ 局部代价图用 odom, 不用 map
+      robot_base_frame: "base_link"
+
+      # 滚动窗口 (以车为中心, 不是全局地图)
+      rolling_window: true
+
+      # 窗口大小 (m) — 不用太大, 只用于局部避障
+      width: 5.0
+      height: 5.0
+
+      # 分辨率 (m/pixel) — 0.05 = 5cm 精度
+      resolution: 0.05
+
+      # 插件 (引用 costmap_common.yaml 里的定义即可)
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+
+      # 膨胀层本地覆盖
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        inflation_radius: 0.35      # 局部可以比全局略小
+
+      # 障碍层
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+
+      # 静态层
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        enabled: true
+
+      # 是否发布完整 footprint 代价 (RViz2 可视化用)
+      publish_footprint: true
+
+      # 超时
+      transform_tolerance: 0.5

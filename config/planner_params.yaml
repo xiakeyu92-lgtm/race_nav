@@ -1,0 +1,27 @@
+# ============================================================
+# planner_params.yaml — A* 全局规划器参数
+# ============================================================
+# 为什么用 A* 而不是 Dijkstra:
+#   A* 有启发式函数 (欧几里得距离), 在开阔场地比 Dijkstra 快很多
+#   你的赛道 50m×25m, A* 完全够用
+# ============================================================
+
+planner_server:
+  ros__parameters:
+
+    # ------ 规划器插件 ------
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_navfn_planner/NavfnPlanner"
+      # NavfnPlanner 内部用的是 A* (Dijkstra 当 tolerance=0)
+      use_astar: true             # ★ 使用 A*
+      tolerance: 0.5              # A* 启发式容差 (0 = 纯 Dijkstra, >0 = 更快但不一定最优)
+
+    # ------ 代价阈值 ------
+    expected_planner_frequency: 1.0  # 期望重规划频率 (Hz)
+
+    # ------ 路径平滑 (可选) ------
+    # 如果你的路径锯齿严重可以开这个
+    # smoother_plugins: ["SimpleSmoother"]
+    # SimpleSmoother:
+    #   plugin: "nav2_smoother::SimpleSmoother"
