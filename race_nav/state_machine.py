@@ -59,8 +59,8 @@ class RaceStateMachine:
     # ================================================================
     # ⚠️  改这里！用 RViz2 Publish Point 获取这些坐标
     # ================================================================
-    P_POINT       = (0.0,  0.0,  0.0)     # 发车点 P (x, y, yaw)
-    QR_POINT      = (3.0,  0.0,  0.0)     # 二维码任务点 (x, y, yaw)
+    P_POINT       = (0.3,  0.3,  0.0)     # 发车点 P (x, y, yaw)
+    QR_POINT      = (4.75, 2.3,  0.0)     # 二维码任务点 (x, y, yaw)
 
     # ================================================================
     # ⚠️  Gen1 写死方向: 'clockwise' 或 'counterclockwise'
@@ -139,24 +139,39 @@ class RaceStateMachine:
             self.state = RaceState.DO_ELLIPSE
 
         elif self.state == RaceState.DO_ELLIPSE:
-            log.info(f'📍 [DO_ELLIPSE] 走椭圆 — {self.wp.direction}')
+            log.info(f'📍 [DO_ELLIPSE] 方向={self.wp.direction}')
 
+            # --- 第1步: 穿过黄色通道 (Area B → Area C) ---
+            # 圈3→圈4→圈5，两侧有墙，waypoint 在通道中心线上
+            log.info('━━━ 通过黄色通道 (Area B → Area C) ━━━')
+            channel_wps = self.wp.get_channel_waypoints()
+            for i, (wx, wy, wyaw) in enumerate(channel_wps):
+                log.info(f'  → 通道 Waypoint {i}/{len(channel_wps)-1}: ({wx:.2f}, {wy:.2f})')
+                if not self.nav.go_to(wx, wy, wyaw,
+                                      timeout_sec=self.WAYPOINT_TIMEOUT):
+                    log.error(f'❌ 通道 Waypoint {i} 失败！')
+                    self.state = RaceState.FAILED
+                    return
+            log.info('✅ 通过黄色通道，进入椭圆区域')
+
+            # --- 第2步: 椭圆环形赛道 (Area C) ---
+            # 按方向 (顺/逆时针) 走指定圈数
             for lap in range(self.wp.num_laps):
-                log.info(f'━━━ 第 {lap + 1}/{self.wp.num_laps} 圈 ━━━')
-                waypoints = self.wp.get_waypoints_for_lap(lap)
+                log.info(f'━━━ 椭圆 第 {lap + 1}/{self.wp.num_laps} 圈 ({self.wp.direction}) ━━━')
+                ellipse_wps = self.wp.get_ellipse_waypoints()
 
-                for i, (wx, wy, wyaw) in enumerate(waypoints):
-                    log.info(f'  → Waypoint {i}/{len(waypoints)-1}: ({wx:.2f}, {wy:.2f})')
+                for i, (wx, wy, wyaw) in enumerate(ellipse_wps):
+                    log.info(f'  → 椭圆 {i}/{len(ellipse_wps)-1}: ({wx:.2f}, {wy:.2f})')
 
                     # ==================== Gen2 扩展点 ====================
                     # 如果当前 waypoint 靠近人形立牌位置:
-                    #   if i in self.wp.get_standee_waypoints():
+                    #   if i in self.wp.get_standee_indices():
                     #       self._handle_standee()  # 识别+大模型+显示屏
                     # ====================================================
 
                     if not self.nav.go_to(wx, wy, wyaw,
                                           timeout_sec=self.WAYPOINT_TIMEOUT):
-                        log.error(f'❌ Waypoint {i} 失败！')
+                        log.error(f'❌ 椭圆 Waypoint {i} 失败！')
                         self.state = RaceState.FAILED
                         return
 
