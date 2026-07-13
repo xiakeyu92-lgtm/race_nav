@@ -1,47 +1,49 @@
 # ============================================================
 # costmap_common.yaml — local & global costmap 共用参数
 # ============================================================
-# 跑道 50m × 25m, 白色围挡高 25cm
-# VP100L 单线激光雷达: 角度分辨率按实际设置
+# /** 通配符: 所有 costmap 节点都会读取这里的参数
+# ============================================================
 
-# --- 机器人足印 (共用) ---
-# 按你的车尺寸修改 — 这里假设一个 50cm×40cm 的小车
-robot_radius: 0.3        # 如果用圆形足印; 用多边形足印则注释掉这条
-# robot_footprint: "[[0.25, 0.20], [0.25, -0.20], [-0.25, -0.20], [-0.25, 0.20]]"
+/**:
+  ros__parameters:
 
-# --- 障碍标记与清除 ---
-obstacle_range: 5.0      # 雷达检测障碍物的最远距离 (m)
-raytrace_range: 6.0      # 射线追踪清除障碍物的最远距离 (m)
+    # --- 机器人足印 (共用) ---
+    robot_radius: 0.3          # 圆形足印; 要用多边形则注释掉
+    # robot_footprint: "[[0.25, 0.20], [0.25, -0.20], [-0.25, -0.20], [-0.25, 0.20]]"
 
-# --- 层叠插件 ---
-plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+    # --- 障碍标记与清除 ---
+    obstacle_range: 5.0        # 雷达检测障碍物的最远距离 (m)
+    raytrace_range: 6.0        # 射线追踪清除障碍物的最远距离 (m)
 
-# --- 静态层 (来自地图) ---
-static_layer:
-  plugin: "nav2_costmap_2d::StaticLayer"
-  map_subscribe_transient_local: true
+    # --- 层叠插件 ---
+    plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
 
-# --- 障碍层 (来自雷达) ---
-obstacle_layer:
-  plugin: "nav2_costmap_2d::ObstacleLayer"
-  enabled: true
-  observation_sources: "laser_scan"
+    # --- 静态层 (来自地图) ---
+    static_layer:
+      plugin: "nav2_costmap_2d::StaticLayer"
+      map_subscribe_transient_local: true
 
-  laser_scan:
-    topic: "/scan"                  # ★ 你的激光雷达话题名
-    max_obstacle_height: 0.35       # 障碍物最大高度 (m) — 围挡高 25cm, 设 35cm 留余量
-    min_obstacle_height: 0.05       # 障碍物最小高度 (m) — 过滤地面反射
-    obstacle_max_range: 5.0         # 雷达数据用于避障的最远距离
-    obstacle_min_range: 0.15        # 雷达最近盲区
-    raytrace_max_range: 6.0
-    raytrace_min_range: 0.15
-    clearing: true                  # 允许清除动态障碍物
-    marking: true                   # 允许标记障碍物
-    data_type: "LaserScan"
-    inf_is_valid: false             # inf 值无效
+    # --- 障碍层 (来自雷达) ---
+    obstacle_layer:
+      plugin: "nav2_costmap_2d::ObstacleLayer"
+      enabled: true
+      observation_sources: "laser_scan"
 
-# --- 膨胀层 ---
-inflation_layer:
-  plugin: "nav2_costmap_2d::InflationLayer"
-  inflation_radius: 0.4             # 障碍物膨胀半径 (m) — 留安全距离
-  cost_scaling_factor: 2.5          # 代价随距离衰减速率
+      laser_scan:
+        topic: "/scan"
+        max_obstacle_height: 0.35
+        min_obstacle_height: 0.05
+        obstacle_max_range: 5.0
+        obstacle_min_range: 0.15
+        raytrace_max_range: 6.0
+        raytrace_min_range: 0.15
+        clearing: true
+        marking: true
+        data_type: "LaserScan"
+        inf_is_valid: false
+
+    # --- 膨胀层 ---
+    inflation_layer:
+      plugin: "nav2_costmap_2d::InflationLayer"
+      inflation_radius: 0.4
+      cost_scaling_factor: 2.5
