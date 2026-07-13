@@ -60,7 +60,7 @@ class WaypointManager:
     ]
 
     # 椭圆圈数
-    DEFAULT_LAPS = 2
+    DEFAULT_LAPS = 1  # 比赛要求沿黄色通道行驶一周
 
     def __init__(self, direction: str = 'clockwise'):
         """

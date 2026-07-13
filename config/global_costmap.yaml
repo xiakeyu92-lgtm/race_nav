@@ -15,7 +15,7 @@ global_costmap:
 
       # 坐标系
       global_frame: "map"           # ★ 全局代价图固定在 map 上
-      robot_base_frame: "base_link"
+      robot_base_frame: "base_footprint"
 
       # 全局固定地图
       rolling_window: false

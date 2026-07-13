@@ -14,8 +14,8 @@ local_costmap:
       publish_frequency: 5.0        # Hz
 
       # 坐标系
-      global_frame: "odom"          # ★ 局部代价图用 odom, 不用 map
-      robot_base_frame: "base_link"
+      global_frame: "odom_combined"  # ★ 局部代价图 (板卡 odom_combined)
+      robot_base_frame: "base_footprint"
 
       # 滚动窗口 (以车为中心, 不是全局地图)
       rolling_window: true

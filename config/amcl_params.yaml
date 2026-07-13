@@ -12,7 +12,7 @@ amcl:
 
     # ------ 坐标系 (关键: 让 AMCL 发布 map→odom TF) ------
     base_frame_id: "base_footprint"     # 车体底盘坐标系
-    odom_frame_id: "odom"               # 里程计坐标系
+    odom_frame_id: "odom_combined"      # 里程计坐标系 (板卡 ekf_node 输出)
     global_frame_id: "map"              # 全局地图坐标系
 
     # ------ 机器人模型 ------
