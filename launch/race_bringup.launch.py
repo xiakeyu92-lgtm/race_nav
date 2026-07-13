@@ -157,17 +157,6 @@ def generate_launch_description():
         ],
     )
 
-    # 8. ★ 比赛状态机（node 内部 go_to() 会等 Nav2 Action Server 就绪）
-    state_machine_node = Node(
-        package='race_nav',
-        executable='race_state_machine',
-        name='race_state_machine',
-        output='screen',
-        parameters=[
-            {'use_sim_time': LaunchConfiguration('use_sim_time')},
-        ],
-    )
-
     # ==================== Launch ====================
     return LaunchDescription([
         map_path_arg,
@@ -179,5 +168,4 @@ def generate_launch_description():
         behavior_node,
         bt_navigator_node,
         lifecycle_manager_node,
-        state_machine_node,
     ])
