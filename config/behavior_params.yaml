@@ -32,6 +32,4 @@ behavior_server:
     # Wait (等待)
     # wait_duration 在 BT XML 里指定
 
-    # BackUp (倒车 — 虽然 BT 里删了, 但参数留着没关系)
-    backup:
-      plugin: "nav2_back_up_action::BackUp"
+    # BackUp: 已删除（环形赛道不倒车，BT XML 里也移除了）
