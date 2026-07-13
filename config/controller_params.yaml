@@ -39,15 +39,37 @@ controller_server:
     vy_samples: 0               # 横移采样数 = 0 (差速底盘)
     vth_samples: 40             # 角速度采样数 → 采样越密轨迹越平滑
 
-    # --- 代价权重 ---
-    PathAlign:
-      scale: 32.0               # 对齐全局路径的权重
+    # --- Critics 评估器 (DWB 必须定义) ---
+    critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+
+    RotateToGoal:
+      plugin: "dwb_critics::RotateToGoal"
+      scale: 32.0
+
+    Oscillation:
+      plugin: "dwb_critics::Oscillation"
+      scale: 0.0
+      oscillation_reset_dist: 0.05
+
+    BaseObstacle:
+      plugin: "dwb_critics::BaseObstacle"
+      scale: 1.0
+
     GoalAlign:
-      scale: 24.0               # 朝向目标的权重
+      plugin: "dwb_critics::GoalAlign"
+      scale: 24.0
+
+    PathAlign:
+      plugin: "dwb_critics::PathAlign"
+      scale: 32.0
+
+    PathDist:
+      plugin: "dwb_critics::PathDist"
+      scale: 32.0
+
     GoalDist:
-      scale: 24.0               # 接近目标的权重
-    ObstacleScale:
-      scale: 1.0                # 避障权重 (Gen3 调大)
+      plugin: "dwb_critics::GoalDist"
+      scale: 24.0
 
     # --- 逆运动学 ---
     use_dwa: false              # false → 使用完整轨迹评分
