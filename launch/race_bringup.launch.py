@@ -21,11 +21,7 @@ race_bringup.launch.py —— 比赛全流程启动文件。
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
-    IncludeLaunchDescription,
-    SetEnvironmentVariable,
-    TimerAction,
 )
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -161,19 +157,14 @@ def generate_launch_description():
         ],
     )
 
-    # 8. ★ 比赛状态机 — 延迟 3 秒等 Nav2 全部就绪后再启动
-    state_machine_node = TimerAction(
-        period=3.0,
-        actions=[
-            Node(
-                package='race_nav',
-                executable='race_state_machine',
-                name='race_state_machine',
-                output='screen',
-                parameters=[
-                    {'use_sim_time': LaunchConfiguration('use_sim_time')},
-                ],
-            )
+    # 8. ★ 比赛状态机（node 内部 go_to() 会等 Nav2 Action Server 就绪）
+    state_machine_node = Node(
+        package='race_nav',
+        executable='race_state_machine',
+        name='race_state_machine',
+        output='screen',
+        parameters=[
+            {'use_sim_time': LaunchConfiguration('use_sim_time')},
         ],
     )
 
