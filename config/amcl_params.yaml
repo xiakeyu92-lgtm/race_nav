@@ -16,7 +16,7 @@ amcl:
     global_frame_id: "map"              # 全局地图坐标系
 
     # ------ 机器人模型 ------
-    robot_model_type: "differential"    # 差速底盘 (你的小车)
+    robot_model_type: "nav2_amcl::DifferentialMotionModel"
 
     # ------ 初始位姿 (比赛时可以调) ------
     # 设小车初始在 map 坐标系原点附近, 协方差设大 → 粒子散开, 设小 → 粒子集中
