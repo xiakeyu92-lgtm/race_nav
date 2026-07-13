@@ -81,7 +81,7 @@ def generate_launch_description():
         ],
     )
 
-    # 3. Controller Server — DWB
+    # 3. Controller Server — DWB（需要 costmap 参数）
     controller_node = Node(
         package='nav2_controller',
         executable='controller_server',
@@ -89,11 +89,13 @@ def generate_launch_description():
         output='screen',
         parameters=[
             PathJoinSubstitution([config_dir, 'controller_params.yaml']),
+            PathJoinSubstitution([config_dir, 'costmap_common.yaml']),
+            PathJoinSubstitution([config_dir, 'local_costmap.yaml']),
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
         ],
     )
 
-    # 4. Planner Server — A*
+    # 4. Planner Server — A*（需要 costmap 参数）
     planner_node = Node(
         package='nav2_planner',
         executable='planner_server',
@@ -101,6 +103,8 @@ def generate_launch_description():
         output='screen',
         parameters=[
             PathJoinSubstitution([config_dir, 'planner_params.yaml']),
+            PathJoinSubstitution([config_dir, 'costmap_common.yaml']),
+            PathJoinSubstitution([config_dir, 'global_costmap.yaml']),
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
         ],
     )
@@ -117,7 +121,7 @@ def generate_launch_description():
         ],
     )
 
-    # 6. BT Navigator — 加载我们的 BT XML (不含 BackUp)
+    # 6. BT Navigator — 只加载 BT XML
     bt_navigator_node = Node(
         package='nav2_bt_navigator',
         executable='bt_navigator',
@@ -130,10 +134,6 @@ def generate_launch_description():
                 ]),
                 'use_sim_time': LaunchConfiguration('use_sim_time'),
             },
-            # 全局 + 局部 costmap 参数
-            PathJoinSubstitution([config_dir, 'costmap_common.yaml']),
-            PathJoinSubstitution([config_dir, 'global_costmap.yaml']),
-            PathJoinSubstitution([config_dir, 'local_costmap.yaml']),
         ],
     )
 
