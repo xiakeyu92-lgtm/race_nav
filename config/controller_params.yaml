@@ -50,7 +50,7 @@ controller_server:
 
     # --- 速度约束 (关键!) ---
     # min_vel_x >= 0 → 绝对不能有负速度 → 不倒车
-    min_vel_x: 0.0
+    min_vel_x: 0.05
     max_vel_x: 0.5
     min_vel_theta: -1.0
     max_vel_theta: 1.0
@@ -73,7 +73,7 @@ controller_server:
     vth_samples: 40
 
     # --- 逆运动学 ---
-    use_dwa: false
+    use_dwa: true
     prune_plan: true
 
     # --- 旋转到位 ---
