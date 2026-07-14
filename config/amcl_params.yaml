@@ -20,10 +20,10 @@ amcl:
 
     # ------ 初始位姿 (比赛时可以调) ------
     # 设小车初始在 map 坐标系原点附近, 协方差设大 → 粒子散开, 设小 → 粒子集中
-    set_initial_pose: false   # 关闭自动设位 → 由 /initialpose topic 手动设
+    set_initial_pose: true
     initial_pose:
-      x: 0.0
-      y: 0.0
+      x: 0.3
+      y: 0.3
       z: 0.0
       yaw: 0.0
     initial_cov_xx: 0.25     # x 方向不确定性 (m²) — 有围挡可设小
