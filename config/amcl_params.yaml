@@ -26,13 +26,13 @@ amcl:
       y: 0.2
       z: 0.0
       yaw: 0.0
-    initial_cov_xx: 0.25     # x 方向不确定性 (m²) — 有围挡可设小
-    initial_cov_yy: 0.25     # y 方向不确定性 (m²)
-    initial_cov_aa: 0.0685   # yaw 方向不确定性 (rad²) — 0.0685 ≈ 15° 的方差
+    initial_cov_xx: 25.0     # 大协方差 → 粒子铺满全地图 (10m×10m)
+    initial_cov_yy: 25.0
+    initial_cov_aa: 3.14     # 360° 全覆盖
 
     # ------ 粒子滤波器参数 ------
-    min_particles: 500        # 最少粒子数
-    max_particles: 2000       # 最多粒子数
+    min_particles: 2000       # 大协方差需要更多粒子
+    max_particles: 5000       # 粒子越多定位越准
     pf_err: 0.01              # 粒子滤波误差
     pf_z: 0.99                # 粒子滤波权重指数衰减
     recovery_alpha_slow: 0.001
