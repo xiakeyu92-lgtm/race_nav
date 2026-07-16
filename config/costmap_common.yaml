@@ -45,5 +45,5 @@
     # --- 膨胀层 ---
     inflation_layer:
       plugin: "nav2_costmap_2d::InflationLayer"
-      inflation_radius: 0.4
-      cost_scaling_factor: 2.5
+      inflation_radius: 0.2
+      cost_scaling_factor: 1.5
