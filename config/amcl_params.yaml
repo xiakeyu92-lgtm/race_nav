@@ -45,7 +45,7 @@ amcl:
 
     # ------ 激光雷达模型 ------
     laser_model_type: "likelihood_field"   # 似然场模型 (计算快, 适合单线雷达)
-    laser_max_range: 15.0                  # VP100L 最大量程
+    laser_max_range: 10.0                  # VP100L 实际~12m, 地图10m够用
     laser_min_range: 0.15                  # VP100L 最小量程
     laser_max_beams: 60                    # 每次更新使用的雷达射线数 (VP100L 单线取60)
     laser_likelihood_max_dist: 2.0         # 似然场最大匹配距离 (m)
