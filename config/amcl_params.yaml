@@ -26,9 +26,9 @@ amcl:
       y: 0.2
       z: 0.0
       yaw: 0.0
-    initial_cov_xx: 25.0     # 大协方差 → 粒子铺满全地图 (10m×10m)
-    initial_cov_yy: 25.0
-    initial_cov_aa: 3.14     # 360° 全覆盖
+    initial_cov_xx: 0.25     # 小协方差，粒子聚在初始位姿附近
+    initial_cov_yy: 0.25
+    initial_cov_aa: 0.0685
 
     # ------ 粒子滤波器参数 ------
     min_particles: 2000       # 大协方差需要更多粒子
