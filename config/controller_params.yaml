@@ -7,34 +7,34 @@ controller_server:
 
     controller_plugins: ["FollowPath"]
 
+    # --- DWB 速度/运动学参数 (在 ros__parameters 层级) ---
+    min_vel_x: 0.0
+    max_vel_x: 0.26
+    min_vel_theta: -1.0
+    max_vel_theta: 1.0
+    min_speed_xy: 0.0
+
+    acc_lim_x: 2.5
+    acc_lim_theta: 3.2
+    dec_lim_x: -2.5
+
+    xy_goal_tolerance: 0.25
+    yaw_goal_tolerance: 0.25
+    latch_xy_goal_tolerance: false
+
+    simulate_ahead_time: 2.0
+    vx_samples: 20
+    vy_samples: 0
+    vth_samples: 40
+
+    use_dwa: false
+
+    transform_tolerance: 0.5
+
+    # --- FollowPath 插件 + Critics (嵌套在 FollowPath 内) ---
     FollowPath:
       plugin: "dwb_core::DWBLocalPlanner"
 
-      # --- DWB 核心参数 (必须在 FollowPath 内!) ---
-      min_vel_x: 0.05
-      max_vel_x: 0.5
-      min_vel_theta: -1.0
-      max_vel_theta: 1.0
-      min_speed_xy: 0.0
-
-      acc_lim_x: 0.5
-      acc_lim_theta: 1.5
-      dec_lim_x: -1.0
-
-      xy_goal_tolerance: 0.15
-      yaw_goal_tolerance: 0.3
-      latch_xy_goal_tolerance: false
-
-      simulate_ahead_time: 1.5
-      vx_samples: 20
-      vy_samples: 0
-      vth_samples: 40
-
-      use_dwa: true
-      prune_plan: true
-      max_vel_theta_when_stopped: 0.5
-
-      # --- Critics (也必须在 FollowPath 内!) ---
       critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
 
       RotateToGoal:
