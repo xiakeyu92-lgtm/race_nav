@@ -1,5 +1,8 @@
 # ============================================================
-# controller_params.yaml — DWB 局部规划器参数
+# controller_params.yaml — RPP 局部规划器参数
+# ============================================================
+# 换用 Regulated Pure Pursuit，不需要 DWB 的轨迹采样
+# RPP 直接根据全局路径算线速度和角速度，稳定可靠
 # ============================================================
 
 controller_server:
@@ -7,61 +10,36 @@ controller_server:
 
     controller_plugins: ["FollowPath"]
 
-    # --- DWB 速度/运动学参数 (在 ros__parameters 层级) ---
-    min_vel_x: 0.0
-    max_vel_x: 0.26
-    min_vel_theta: -1.0
-    max_vel_theta: 1.0
-    min_speed_xy: 0.0
-
-    acc_lim_x: 2.5
-    acc_lim_theta: 3.2
-    dec_lim_x: -2.5
-
-    xy_goal_tolerance: 0.25
-    yaw_goal_tolerance: 0.25
-    latch_xy_goal_tolerance: false
-
-    simulate_ahead_time: 2.0
-    vx_samples: 20
-    vy_samples: 0
-    vth_samples: 40
-
-    use_dwa: false
-
-    transform_tolerance: 0.5
-
-    # --- FollowPath 插件 + Critics (嵌套在 FollowPath 内) ---
     FollowPath:
-      plugin: "dwb_core::DWBLocalPlanner"
+      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
 
-      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+      # --- 速度 ---
+      desired_linear_vel: 0.3
+      max_linear_vel: 0.5
+      min_linear_vel: 0.0
+      max_angular_vel: 1.0
+      min_angular_vel: 0.0
 
-      RotateToGoal:
-        plugin: "dwb_critics::RotateToGoal"
-        scale: 32.0
+      # --- 前瞻距离 ---
+      lookahead_dist: 0.5
+      max_lookahead_dist: 1.0
+      min_lookahead_dist: 0.3
 
-      Oscillation:
-        plugin: "dwb_critics::Oscillation"
-        scale: 0.0
-        oscillation_reset_dist: 0.05
+      # --- 精度 ---
+      transform_tolerance: 0.5
+      goal_dist_tol: 0.25
+      rotate_to_heading_angular_vel: 0.5
 
-      BaseObstacle:
-        plugin: "dwb_critics::BaseObstacle"
-        scale: 1.0
-
-      GoalAlign:
-        plugin: "dwb_critics::GoalAlign"
-        scale: 24.0
-
-      PathAlign:
-        plugin: "dwb_critics::PathAlign"
-        scale: 32.0
-
-      PathDist:
-        plugin: "dwb_critics::PathDist"
-        scale: 32.0
-
-      GoalDist:
-        plugin: "dwb_critics::GoalDist"
-        scale: 24.0
+      # --- 其他 ---
+      use_approach_linear_velocity_scaling: true
+      max_allowed_time_to_collision_up_to_carrot: 1.0
+      use_regulated_linear_velocity_scaling: true
+      use_cost_regulated_linear_velocity_scaling: false
+      cost_scaling_dist: 0.6
+      cost_scaling_gain: 1.0
+      inflation_cost_scaling_factor: 3.0
+      regulated_linear_scaling_min_radius: 0.9
+      regulated_linear_scaling_min_speed: 0.25
+      use_rotate_to_heading: true
+      rotate_to_heading_min_angle: 0.785
+      max_angular_accel: 3.2
